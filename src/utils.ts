@@ -1,4 +1,6 @@
 import algosdk from "algosdk";
+require("dotenv").config();
+
 export interface SandboxAccount {
   addr: string;
   privateKey: Uint8Array;
@@ -77,4 +79,27 @@ export function getLocalAlgodClient() {
 
   const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
   return algodClient;
+}
+
+export function getMainnetAlgodClient(): algosdk.Algodv2 {
+  const algodToken: any = process.env.TOKEN;
+  const algodServer = "https://mainnet-algorand.api.purestake.io/ps2";
+  const algodPort = process.env.ALGOD_PORT || "4001";
+  const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
+  return algodClient;
+}
+
+export async function getMemPoolTransactions(
+  algodClient: algosdk.Algodv2
+): Promise<any> {
+  return algodClient
+    .pendingTransactionsInformation()
+    .max(10)
+    .do()
+    .then((response: any) => {
+      return response;
+    })
+    .catch((error: any) => {
+      console.log(error);
+    });
 }

@@ -12,7 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.15.11",
-    "algosdk": "^2.2.0"
+    "algosdk": "^2.2.0",
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
     "prettier": "^2.8.7",

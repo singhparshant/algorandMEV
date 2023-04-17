@@ -3,6 +3,8 @@ import {
   getLocalAccounts,
   getLocalAlgodClient,
   getLocalIndexerClient,
+  getMainnetAlgodClient,
+  getMemPoolTransactions,
   SandboxAccount,
 } from "./utils";
 
@@ -12,7 +14,7 @@ async function sendTransaction(
   amount: number
 ): Promise<string> {
   const algodClient = getLocalAlgodClient();
-
+  console.log(`algodClient: ${algodClient}`);
   const senderAddress = algosdk.encodeAddress(privateKey.slice(32));
   console.log(`Sender address: ${senderAddress}`);
 
@@ -49,21 +51,31 @@ async function sendTransaction(
 }
 
 async function main() {
-  const accounts = await getLocalAccounts();
-  const sender = accounts[0];
-  console.log(`Actual Sender address: ${sender.addr}`);
+  const algodClient: algosdk.Algodv2 = getMainnetAlgodClient();
+  // const response = await getMemPoolTransactions(algodClient);
+  console.log(`algodClient: ${await algodClient.healthCheck().doRaw()}`);
+  const response = await algodClient
+    .pendingTransactionsInformation()
+    .max(10)
+    .doRaw();
 
-  const receiverAddress =
-    "A7NMWS3NT3IUDMLVO26ULGXGIIOUQ3ND2TXSER6EBGRZNOBOUIQXHIBGDE";
-  const amount = 1_000_000; // 1 Algo
-  console.log(`isvalid address: ${algosdk.isValidAddress(receiverAddress)}`);
+  console.log("TXNS: ", response);
+
+  // const accounts = await getLocalAccounts();
+  // const sender = accounts[0];
+  // console.log(`Actual Sender address: ${sender.addr}`);
+
+  // const receiverAddress =
+  //   "A7NMWS3NT3IUDMLVO26ULGXGIIOUQ3ND2TXSER6EBGRZNOBOUIQXHIBGDE";
+  // const amount = 3_000_000; // 1 Algo
+  // console.log(`isvalid address: ${algosdk.isValidAddress(receiverAddress)}`);
   try {
-    const txId = await sendTransaction(
-      sender.privateKey,
-      receiverAddress,
-      amount
-    );
-    console.log(`Transaction sent! Transaction ID: ${txId}`);
+    // const txId = await sendTransaction(
+    //   sender.privateKey,
+    //   receiverAddress,
+    //   amount
+    // );
+    // console.log(`Transaction sent! Transaction ID: ${txId}`);
   } catch (error) {
     console.error(`Error sending transaction: ${error}`);
   }
