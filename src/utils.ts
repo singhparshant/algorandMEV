@@ -82,24 +82,21 @@ export function getLocalAlgodClient() {
 }
 
 export function getMainnetAlgodClient(): algosdk.Algodv2 {
-  const algodToken: any = process.env.TOKEN;
+  const algodToken: any = {
+    "X-API-key": process.env.TOKEN,
+  };
   const algodServer = "https://mainnet-algorand.api.purestake.io/ps2";
-  const algodPort = process.env.ALGOD_PORT || "4001";
+  const algodPort = process.env.ALGOD_PORT || "";
   const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
   return algodClient;
 }
 
 export async function getMemPoolTransactions(
   algodClient: algosdk.Algodv2
-): Promise<any> {
-  return algodClient
+): Promise<Record<string, any>> {
+  const pendingTxns: Record<string, any> = await algodClient
     .pendingTransactionsInformation()
     .max(10)
-    .do()
-    .then((response: any) => {
-      return response;
-    })
-    .catch((error: any) => {
-      console.log(error);
-    });
+    .do();
+  return pendingTxns;
 }

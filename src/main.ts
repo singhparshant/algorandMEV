@@ -52,23 +52,25 @@ async function sendTransaction(
 
 async function main() {
   const algodClient: algosdk.Algodv2 = getMainnetAlgodClient();
-  // const response = await getMemPoolTransactions(algodClient);
-  console.log(`algodClient: ${await algodClient.healthCheck().doRaw()}`);
-  const response = await algodClient
-    .pendingTransactionsInformation()
-    .max(10)
-    .doRaw();
+  const response: Record<string, any> = await getMemPoolTransactions(
+    algodClient
+  );
+  console.log(response);
+  console.log(response["top-transactions"]);
 
-  console.log("TXNS: ", response);
+  console.log(
+    "TXNS: ",
+    algosdk.encodeAddress(response["top-transactions"][0].txn.snd)
+  );
 
-  // const accounts = await getLocalAccounts();
-  // const sender = accounts[0];
-  // console.log(`Actual Sender address: ${sender.addr}`);
+  const accounts = await getLocalAccounts();
+  const sender = accounts[0];
+  console.log(`Actual Sender address: ${sender.addr}`);
 
-  // const receiverAddress =
-  //   "A7NMWS3NT3IUDMLVO26ULGXGIIOUQ3ND2TXSER6EBGRZNOBOUIQXHIBGDE";
-  // const amount = 3_000_000; // 1 Algo
-  // console.log(`isvalid address: ${algosdk.isValidAddress(receiverAddress)}`);
+  const receiverAddress =
+    "A7NMWS3NT3IUDMLVO26ULGXGIIOUQ3ND2TXSER6EBGRZNOBOUIQXHIBGDE";
+  const amount = 3_000_000; // 1 Algo
+  console.log(`isvalid address: ${algosdk.isValidAddress(receiverAddress)}`);
   try {
     // const txId = await sendTransaction(
     //   sender.privateKey,
