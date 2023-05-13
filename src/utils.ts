@@ -85,10 +85,24 @@ export function getMainnetAlgodClient(): algosdk.Algodv2 {
   const algodToken: any = {
     "X-API-key": process.env.TOKEN,
   };
-  const algodServer = "https://mainnet-algorand.api.purestake.io/ps2";
+  const algodServer = "https://testnet-algorand.api.purestake.io/ps2";
   const algodPort = process.env.ALGOD_PORT || "";
   const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
   return algodClient;
+}
+
+export function getMainnetIndexerClient(): algosdk.Indexer {
+  const algodToken: any = {
+    "X-API-key": process.env.TOKEN,
+  };
+  const indexerServer = "https://testnet-algorand.api.purestake.io/idx2";
+  const indexerPort = process.env.INDEXER_PORT || "";
+  const indexerClient = new algosdk.Indexer(
+    algodToken,
+    indexerServer,
+    indexerPort
+  );
+  return indexerClient;
 }
 
 export async function getMemPoolTransactions(
