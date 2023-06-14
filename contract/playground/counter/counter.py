@@ -1,35 +1,50 @@
+import algosdk
 import pyteal as pt
-from algokit_utils import LogicError
 import algokit_utils
+
+# from beaker import Application, Authorize, GlobalStateValue, sandbox
+# from beaker.client import ApplicationClient
+from algosdk import mnemonic, account, transaction, atomic_transaction_composer, abi
+from algosdk.atomic_transaction_composer import AccountTransactionSigner
+from algosdk.v2client import algod
 
 from beaker import (
     Application,
     Authorize,
     GlobalStateValue,
     sandbox,
+    unconditional_create_approval,
 )
+
 from beaker.client import ApplicationClient
-from algosdk import mnemonic
-from algosdk import account
-from algosdk.atomic_transaction_composer import AccountTransactionSigner
-from algosdk.v2client import algod
+from algosdk.atomic_transaction_composer import (
+    ABIResult,
+    AtomicTransactionComposer,
+    TransactionSigner,
+    TransactionWithSigner,
+)
 
 
 class CounterState:
     counter = GlobalStateValue(
         stack_type=pt.TealType.uint64,
+        default=pt.Int(5),
         descr="A counter for showing how to use application state",
     )
 
 
-counter_app = Application("CounterApp", state=CounterState())
+counter_app = Application("CounterApp", state=CounterState()).apply(
+    unconditional_create_approval, initialize_global_state=True
+)
 
 
 @counter_app.external(authorize=Authorize.only_creator())
 def increment(*, output: pt.abi.Uint64) -> pt.Expr:
     """increment the counter"""
     return pt.Seq(
-        counter_app.state.counter.set(counter_app.state.counter + pt.Int(1)),
+        counter_app.state.counter.set(
+            (counter_app.state.counter * pt.Int(3)) / pt.Int(2)
+        ),
         output.set(counter_app.state.counter),
     )
 
@@ -59,19 +74,37 @@ def demo() -> None:
     # client = algokit_utils.get_algod_client(
     #     algokit_utils.AlgoClientConfig("http://localhost:4001", "a" * 64)
     # )
-    print_address(mnemonic_1)
-    print("client: ", client)
+    # print_address(mnemonic_1)
+    # print("client: ", client)
     # insert try catch here
 
     # accts = sandbox.get_accounts()
     # acct = accts.pop()
-    print("private_key: ", mnemonic.to_private_key(mnemonic_1))
-    # Create an Application client containing both an algod client and my app
+    private_key = mnemonic.to_private_key(mnemonic_1)
+    # print("Account address: ", account.address_from_private_key(private_key))
+    # # Create an Application client containing both an algod client and my app
     app_client = ApplicationClient(
         client=client,
         app=counter_app,
-        signer=AccountTransactionSigner(mnemonic.to_private_key(mnemonic_1)),
+        signer=AccountTransactionSigner(private_key),
     )
+    # with open("artifacts/contract.json") as f:
+    #     js = f.read()
+    # contract = abi.Contract.from_json(js)
+
+    # atc = AtomicTransactionComposer()
+    # atc.add_method_call(
+    #     app_id=212011117,
+    #     method=contract.get_method_by_name("increment"),
+    #     method_args=[],
+    #     sp=client.suggested_params(),
+    #     sender=account.address_from_private_key(private_key),
+    #     signer=AccountTransactionSigner(private_key),
+    # )
+
+    # txids = atc.submit(client)
+    # print("txids: ", txids)
+    # print("app_client: ", app_client.app_id)
 
     # app_client = ApplicationClient(
     #     client=client,
@@ -83,24 +116,67 @@ def demo() -> None:
     app_id, app_addr, txid = app_client.create()
     print(f"Created App with id: {app_id} and address addr: {app_addr} in tx: {txid}")
 
-    app_client.call(increment)
-    app_client.call(increment)
-    app_client.call(increment)
-    result = app_client.call(increment)
-    print(f"Currrent counter value: {result.return_value}")
+    # noop_txn = transaction.ApplicationNoOpTxn(
+    #     account.address_from_private_key(private_key), sp, app_id
+    # )
 
-    result = app_client.call(decrement)
-    print(f"Currrent counter value: {result.return_value}")
+    # ApplicationClient(client,  , AccountTransactionSigner(private_key))
 
-    # try:
-    #     # Try to call the increment method with a different signer, it should fail
-    #     # since we have the auth check
-    #     other_acct = accts.pop()
-    #     other_client = app_client.prepare(signer=other_acct.signer)
-    #     other_client.call(increment)
-    # except LogicError as e:
-    #     print(e)
-    #     print("App call failed as expected.")
+    # app_client.call(increment)
+    # Get suggested transaction parameters
+    # params = client.suggested_params()
+
+    # Define the method name and arguments
+    # method_name = "increment"
+    # method_args = []
+    # txn = transaction.ApplicationCallTxn(
+    #     account.address_from_private_key(private_key),
+    #     params,
+    #     212011117,
+    #     transaction.OnComplete.NoOpOC,
+    #     method_args,
+    #     None,
+    #     None,
+    #     None,
+    #     method_name,
+    # )
+    # signed_txn = txn.sign(private_key)
+
+    # # Send the transaction
+    # txid = client.send_transaction(signed_txn)
+    # print("Transaction ID:", txid)
+
+    # # Wait for transaction confirmation (define the wait_for_confirmation function if not already defined)
+    # wait_for_confirmation(client, txid)
+    # pending_txns = client.pending_transactions()
+
+    # # Extract the transaction IDs from the list
+    # print("pending_txns: ", pending_txns)
+    # txn_ids = [txn.get("tx") for txn in pending_txns.get("transactions")]
+
+    # Print the transaction IDs
+    # print("Pending transaction IDs:", txn_ids)
+    # app_client.call(decrement)
+    # print("app state: ", app_client.get_global_state())
+
+    # app_client.call(increment)
+    # result = app_client.call(increment)
+
+
+# print(f"Currrent counter value: {result.return_value}")
+
+# result = app_client.call(decrement)
+# print(f"Currrent counter value: {result.return_value}")
+
+# try:
+#     # Try to call the increment method with a different signer, it should fail
+#     # since we have the auth check
+#     other_acct = accts.pop()
+#     other_client = app_client.prepare(signer=other_acct.signer)
+#     other_client.call(increment)
+# except LogicError as e:
+#     print(e)
+#     print("App call failed as expected.")
 
 
 def print_address(mn):
