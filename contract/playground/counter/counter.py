@@ -17,12 +17,6 @@ from beaker import (
 )
 
 from beaker.client import ApplicationClient
-from algosdk.atomic_transaction_composer import (
-    ABIResult,
-    AtomicTransactionComposer,
-    TransactionSigner,
-    TransactionWithSigner,
-)
 
 
 class CounterState:
@@ -88,29 +82,6 @@ def demo() -> None:
         app=counter_app,
         signer=AccountTransactionSigner(private_key),
     )
-    # with open("artifacts/contract.json") as f:
-    #     js = f.read()
-    # contract = abi.Contract.from_json(js)
-
-    # atc = AtomicTransactionComposer()
-    # atc.add_method_call(
-    #     app_id=212011117,
-    #     method=contract.get_method_by_name("increment"),
-    #     method_args=[],
-    #     sp=client.suggested_params(),
-    #     sender=account.address_from_private_key(private_key),
-    #     signer=AccountTransactionSigner(private_key),
-    # )
-
-    # txids = atc.submit(client)
-    # print("txids: ", txids)
-    # print("app_client: ", app_client.app_id)
-
-    # app_client = ApplicationClient(
-    #     client=client,
-    #     app=counter_app,
-    #     signer=acct.signer,
-    # )
 
     # Create the applicatiion on chain, set the app id for the app client
     app_id, app_addr, txid = app_client.create()

@@ -46,10 +46,10 @@ def generate_plot():
 
     # Print the results on the plot
     plt.subplots_adjust(top=0.85)
-    plt.figtext(0.2, 0.92, increment_info, fontsize=10, color="blue")
-    plt.figtext(0.2, 0.9, decrement_info, fontsize=10, color="red")
+    plt.figtext(0.3, 0.93, increment_info, fontsize=10, color="blue")
+    plt.figtext(0.3, 0.9, decrement_info, fontsize=10, color="red")
 
-    # plt.savefig("plot.svg", format="svg")
+    plt.savefig("plot.svg", format="svg")
     plt.show()
 
 

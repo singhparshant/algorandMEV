@@ -81,11 +81,31 @@ export function getLocalAlgodClient() {
   return algodClient;
 }
 
-export function getMainnetAlgodClient(): algosdk.Algodv2 {
+export function getTestnetAlgodClient(): algosdk.Algodv2 {
   const algodToken: any = {
     "X-API-key": process.env.TOKEN,
   };
   const algodServer = "https://testnet-algorand.api.purestake.io/ps2";
+  const algodPort = process.env.ALGOD_PORT || "";
+  const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
+  return algodClient;
+}
+
+export function getTestnetAlgodClientTUM(): algosdk.Algodv2 {
+  const algodToken: any = {
+    "X-Algo-API-Token": process.env.TOKEN2,
+  };
+  const algodServer = "http://131.159.14.109";
+  const algodPort = process.env.ALGOD_PORT || 8081;
+  const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
+  return algodClient;
+}
+
+export function getMainnetAlgodClient(): algosdk.Algodv2 {
+  const algodToken: any = {
+    "X-API-key": process.env.TOKEN,
+  };
+  const algodServer = "https://mainnet-algorand.api.purestake.io/ps2";
   const algodPort = process.env.ALGOD_PORT || "";
   const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
   return algodClient;
@@ -105,12 +125,36 @@ export function getMainnetIndexerClient(): algosdk.Indexer {
   return indexerClient;
 }
 
-export async function getMemPoolTransactions(
+export function getTestnetIndexerClient(): algosdk.Indexer {
+  const algodToken: any = {
+    "X-API-key": process.env.TOKEN,
+  };
+  const indexerServer = "https://testnet-algorand.api.purestake.io/idx2";
+  const indexerPort = process.env.INDEXER_PORT || "";
+  const indexerClient = new algosdk.Indexer(
+    algodToken,
+    indexerServer,
+    indexerPort
+  );
+  return indexerClient;
+}
+
+export async function printMempoolTransactions(
   algodClient: algosdk.Algodv2
-): Promise<Record<string, any>> {
+): Promise<void> {
   const pendingTxns: Record<string, any> = await algodClient
     .pendingTransactionsInformation()
-    .max(10)
+    .max(20)
     .do();
-  return pendingTxns;
+
+  const mempool = pendingTxns["top-transactions"].map((result: any) => ({
+    sender: algosdk.encodeAddress(result.txn.snd),
+    // txId: result.txn,
+  }));
+  console.log(mempool);
+}
+
+export async function printCurrentRound(algodClient: algosdk.Algodv2) {
+  const status = await algodClient.status().do();
+  console.log(`Current round: ${status["last-round"]}`);
 }

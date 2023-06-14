@@ -26,7 +26,7 @@ def generate_data():
     token = ""
     headers = {"X-API-Key": os.getenv("TOKEN")}
     address = "https://testnet-algorand.api.purestake.io/ps2"
-    app_id = 238906986
+    app_id = 238973594  # 238906986
     # demonstration purposes only, never use mnemonics in code
     mnemonic_1 = os.getenv("MNEMONIC")
 
@@ -45,11 +45,13 @@ def generate_data():
         js = f.read()
     contract = abi.Contract.from_json(js)
 
-    for i in range(5):
+    for i in range(100):
         previous_value = print_global_state(client, app_id)
         print("Previous Value:", previous_value)
         atc1 = AtomicTransactionComposer()
         atc2 = AtomicTransactionComposer()
+        sp = client.suggested_params()
+        sp.fee = 500
         atc1.add_method_call(
             app_id=app_id,
             method=contract.get_method_by_name("decrement"),
@@ -59,13 +61,11 @@ def generate_data():
             signer=AccountTransactionSigner(private_key),
         )
 
-        sp = client.suggested_params()
-        sp.fee = 500
         atc2.add_method_call(
             app_id=app_id,
             method=contract.get_method_by_name("increment"),
             method_args=[],
-            sp=sp,
+            sp=client.suggested_params(),
             sender=account.address_from_private_key(private_key),
             signer=AccountTransactionSigner(private_key),
         )
