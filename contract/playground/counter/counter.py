@@ -15,6 +15,10 @@ from beaker import (
     sandbox,
     unconditional_create_approval,
 )
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
 
 from beaker.client import ApplicationClient
 
@@ -55,12 +59,12 @@ def decrement(*, output: pt.abi.Uint64) -> pt.Expr:
 def demo() -> None:
     # client = sandbox.get_algod_client()
     token = ""
-    headers = {"X-API-Key": "jxSOmPn4DN3DpLNbylkiS2AMijXrb2Nl575cw3Fq"}
+    headers = {"X-API-Key": os.getenv("TOKEN")}
     address = "https://testnet-algorand.api.purestake.io/ps2"
     # demonstration purposes only, never use mnemonics in code
-    mnemonic_1 = "swear emerge betray stone path stamp vacant credit inmate wrist fury bronze sheriff era jacket wheel genius floor expose proof armor sorry blast abandon brave"
-
+    mnemonic_1 = os.getenv("MNEMONIC")
     client = algod.AlgodClient(token, address, headers)
+
     # client = algokit_utils.get_algod_client(
     #     algokit_utils.AlgoClientConfig(address, token)
     # )
