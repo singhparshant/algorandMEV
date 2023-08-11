@@ -1,3 +1,4 @@
+import time
 import algosdk
 import pyteal as pt
 import algokit_utils
@@ -16,52 +17,52 @@ from algosdk.atomic_transaction_composer import (
 )
 import base64
 import os
+from playground.experiments.utils import (
+    get_testnet_TUM_algod_client,
+    get_testnet_algod_client,
+)
 from dotenv import load_dotenv
 import csv
-import time
 
 load_dotenv()  # take environment variables from .env.
 
 
 def generate_data():
-    token = ""
-    headers = {"X-API-Key": os.getenv("TOKEN")}
-    address = "https://testnet-algorand.api.purestake.io/ps2"
-    app_id = 251611912  # 238906986
-    # demonstration purposes only, never use mnemonics in code
     mnemonic_1 = os.getenv("MNEMONIC")
+    private_key = mnemonic.to_private_key(mnemonic_1)
+    app_id = 253270008  # 238906986
 
     # Initialize counters for increment and decrement functions
     increment_count = 0
     decrement_count = 0
-    first_function = "None"
-    color = ""
 
     # Initialize lists to store data for scatter plot
     x_values = []  # Function names
     y_values = []  # Frequency of each function
     colors = []  # Color of each point
 
-    client = algod.AlgodClient(token, address, headers)
-    private_key = mnemonic.to_private_key(mnemonic_1)
+    first_function = "None"
+    color = ""
+
+    client1 = get_testnet_algod_client()
+    # client1 = get_testnet_TUM_algod_client()
+    client2 = get_testnet_TUM_algod_client()
+    # client2 = get_testnet_algod_client()
+
     with open("../last_executed/artifacts/contract.json") as f:
         js = f.read()
     contract = abi.Contract.from_json(js)
-    print("Contract: ", contract)
 
-    for i in range(500):
-        print("Iteration: ", i)
-        previous_value = print_global_state(client, app_id)
+    for i in range(100):
+        previous_value = print_global_state(client2, app_id)
         print("Previous Value:", previous_value)
         atc1 = AtomicTransactionComposer()
         atc2 = AtomicTransactionComposer()
-        sp = client.suggested_params()
-        sp.fee = 500
         atc1.add_method_call(
             app_id=app_id,
             method=contract.get_method_by_name("decrement"),
             method_args=[],
-            sp=client.suggested_params(),
+            sp=client1.suggested_params(),
             sender=account.address_from_private_key(private_key),
             signer=AccountTransactionSigner(private_key),
         )
@@ -70,41 +71,27 @@ def generate_data():
             app_id=app_id,
             method=contract.get_method_by_name("increment"),
             method_args=[],
-            sp=sp,
+            sp=client2.suggested_params(),
             sender=account.address_from_private_key(private_key),
             signer=AccountTransactionSigner(private_key),
         )
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future1 = executor.submit(submit_atc, atc1, client)
-            # add a delay of 1 second to ensure that the transactions are not submitted at the same time
-            time.sleep(0.01)
-            future2 = executor.submit(submit_atc, atc2, client)
+            future1 = executor.submit(submit_atc, atc1, client1)
+            # time.sleep(0.1)
+            future2 = executor.submit(submit_atc, atc2, client2)
 
             txids1 = future1.result()
             txids2 = future2.result()
 
             print("txids for atc1: ", txids1)
             print("txids for atc2: ", txids2)
-            wait_for_confirmation(client, txids1[0])
-            wait_for_confirmation(client, txids2[0])
+            wait_for_confirmation(client1, txids1[0])
+            wait_for_confirmation(client2, txids2[0])
 
-        updated_value = print_global_state(client, app_id)
+        updated_value = print_global_state(client1, app_id)
         print("After Value: ", updated_value, "\n")
 
-        # if (previous_value - 1) * 3 // 2 == updated_value:
-        #     print("Decrement")
-        #     first_function = "Decrement"
-        #     decrement_count += 1
-        #     color = "red"  # Assign red color for Decrement
-        # elif ((previous_value * 3 // 2)) - 1 == updated_value:
-        #     print("Increment")
-        #     first_function = "Increment"
-        #     increment_count += 1
-        #     color = "blue"  # Assign blue color for Increment
-        # else:
-        #     first_function = "None"
-        #     color = "gray"  # Assign gray color for None
         if updated_value == "increment":
             print("decrement first")
             first_function = "Decrement"

@@ -16,6 +16,7 @@
     "@types/plotly.js": "^2.12.18",
     "algosdk": "^2.2.0",
     "dotenv": "^16.0.3",
+    "near-sdk-js": "^1.0.0",
     "plotly": "^1.0.6",
     "plotly.js": "^2.23.2"
   },

@@ -40,8 +40,8 @@ def generate_plot():
     )  # ensure the x-axis values are integers
 
     # Create custom legend
-    red_patch = mpatches.Patch(color="red", label="Decrement")
-    blue_patch = mpatches.Patch(color="blue", label="Increment(higher fee)")
+    red_patch = mpatches.Patch(color="red", label="Decrement(Purestake Node)")
+    blue_patch = mpatches.Patch(color="blue", label="Increment(TUM Node)")
     plt.legend(handles=[red_patch, blue_patch])
 
     # Print the results on the plot
