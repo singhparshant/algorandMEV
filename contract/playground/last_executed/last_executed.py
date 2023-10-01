@@ -16,7 +16,7 @@ from beaker import (
     unconditional_create_approval,
 )
 import os
-from playground.experiments.utils import get_testnet_algod_client
+from playground.experiments.utils import get_testbed_algod_client, get_testnet_algod_client
 from playground.experiments.utils import get_testnet_TUM_algod_client
 from dotenv import load_dotenv
 
@@ -57,12 +57,14 @@ def decrement(*, output: pt.abi.String) -> pt.Expr:
 
 
 def demo() -> None:
-    # client = sandbox.get_algod_client()
+    token = ""
+    headers = {
+        "Authorization": "Bearer 97361fdc801fe9fd7f2ae87fa4ea5dc8b9b6ce7380c230eaf5494c4cb5d38d61"
+    }
+    address = "http://192.168.30.2:4100" #"https://testnet-algorand.api.purestake.io/ps2"
     # demonstration purposes only, never use mnemonics in code
-    mnemonic_1 = os.getenv("MNEMONIC")
-    # client = algod.AlgodClient(token, address, headers)
-    # client = get_testnet_TUM_algod_client()
-    client = get_testnet_algod_client()
+    mnemonic_1 = "rifle door book aim slogan joke load hair athlete shock castle lion speed rocket distance spawn add badge genius zero chef enforce suffer absent frost"
+    client = algod.AlgodClient(token, address, headers)
 
     # client = algokit_utils.get_algod_client(
     #     algokit_utils.AlgoClientConfig(address, token)
@@ -79,62 +81,85 @@ def demo() -> None:
     # acct = accts.pop()
     private_key = mnemonic.to_private_key(mnemonic_1)
     print("Account address: ", account.address_from_private_key(private_key))
+    print("last_executed: ", last_executed)
     # # Create an Application client containing both an algod client and my app
-    app_client = ApplicationClient(
-        client=client,
-        app=last_executed,
-        signer=AccountTransactionSigner(private_key),
-    )
+    try:
+        # # Create an Application client containing both an algod client and my app
+        app_client = ApplicationClient(
+            client=client,
+            app=last_executed,
+            signer=AccountTransactionSigner(private_key),
+        )
 
-    print("app client: ", app_client)
+        print("app client: ", app_client)
 
-    # Create the applicatiion on chain, set the app id for the app client
-    app_id, app_addr, txid = app_client.create()
-    print(f"Created App with id: {app_id} and address addr: {app_addr} in tx: {txid}")
+        # Create the applicatiion on chain, set the app id for the app client
+        app_id, app_addr, txid = app_client.create()
+        print(f"Created App with id: {app_id} and address addr: {app_addr} in tx: {txid}")
 
-    # noop_txn = transaction.ApplicationNoOpTxn(
-    #     account.address_from_private_key(private_key), sp, app_id
+        app_client.call(increment)
+        app_client.call(decrement)
+        print("app state: ", app_client.get_global_state())
+
+    except algosdk.error.AlgodHTTPError as e:
+        print("Encountered an AlgodHTTPError:", e)
+    except Exception as e:
+        print("Encountered a general exception:", e)
+    # app_client = ApplicationClient(
+    #     client=client,
+    #     app=last_executed,
+    #     signer=AccountTransactionSigner(private_key),
     # )
 
-    # ApplicationClient(client,  , AccountTransactionSigner(private_key))
+    # print("app client: ", app_client)
 
+    # # Create the applicatiion on chain, set the app id for the app client
+    # app_id, app_addr, txid = app_client.create()
+    # print(f"Created App with id: {app_id} and address addr: {app_addr} in tx: {txid}")
+
+    # # noop_txn = transaction.ApplicationNoOpTxn(
+    # #     account.address_from_private_key(private_key), sp, app_id
+    # # )
+
+    # # ApplicationClient(client,  , AccountTransactionSigner(private_key))
+
+    # # app_client.call(increment)
+    # # Get suggested transaction parameters
+    # # params = client.suggested_params()
+
+    # # Define the method name and arguments
+    # # method_name = "increment"
+    # # method_args = []
+    # # txn = transaction.ApplicationCallTxn(
+    # #     account.address_from_private_key(private_key),
+    # #     params,
+    # #     212011117,
+    # #     transaction.OnComplete.NoOpOC,
+    # #     method_args,
+    # #     None,
+    # #     None,
+    # #     None,
+    # #     method_name,
+    # # )
+    # # signed_txn = txn.sign(private_key)
+
+    # # # Send the transaction
+    # # txid = client.send_transaction(signed_txn)
+    # # print("Transaction ID:", txid)
+
+    # # # Wait for transaction confirmation (define the wait_for_confirmation function if not already defined)
+    # # wait_for_confirmation(client, txid)
+    # # pending_txns = client.pending_transactions()
+
+    # # # Extract the transaction IDs from the list
+    # # print("pending_txns: ", pending_txns)
+    # # txn_ids = [txn.get("tx") for txn in pending_txns.get("transactions")]
+
+    # # Print the transaction IDs
+    # # print("Pending transaction IDs:", txn_ids)
     # app_client.call(increment)
-    # Get suggested transaction parameters
-    # params = client.suggested_params()
-
-    # Define the method name and arguments
-    # method_name = "increment"
-    # method_args = []
-    # txn = transaction.ApplicationCallTxn(
-    #     account.address_from_private_key(private_key),
-    #     params,
-    #     212011117,
-    #     transaction.OnComplete.NoOpOC,
-    #     method_args,
-    #     None,
-    #     None,
-    #     None,
-    #     method_name,
-    # )
-    # signed_txn = txn.sign(private_key)
-
-    # # Send the transaction
-    # txid = client.send_transaction(signed_txn)
-    # print("Transaction ID:", txid)
-
-    # # Wait for transaction confirmation (define the wait_for_confirmation function if not already defined)
-    # wait_for_confirmation(client, txid)
-    # pending_txns = client.pending_transactions()
-
-    # # Extract the transaction IDs from the list
-    # print("pending_txns: ", pending_txns)
-    # txn_ids = [txn.get("tx") for txn in pending_txns.get("transactions")]
-
-    # Print the transaction IDs
-    # print("Pending transaction IDs:", txn_ids)
-    app_client.call(increment)
-    app_client.call(decrement)
-    print("app state: ", app_client.get_global_state())
+    # app_client.call(decrement)
+    # print("app state: ", app_client.get_global_state())
 
 
 # print(f"Currrent counter value: {result.return_value}")
