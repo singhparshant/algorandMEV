@@ -58,7 +58,7 @@ def send_funds(private_key, to_address, amount, node_address, node_token):
 
 def main():
     example_private_key = "UK790krMFIp90Z02KuuLk+g6O5GOnQwSBYyqqMCw/w/z03/UuY2YCWL3xuu8RXC13ybK5QauZ+2hkgh+ZM2y/A=="
-    example_to_address = "3T4I75ZV2BHNYOHV2MNKKE34CMGUXYVEJZPDU53LX3S2E5UDOFKN4M7AQQ" # "P4IUIPHOHJTWFKMYYKZCBY3B6CVZ5RASWXHSFTJK2UYIGCVOLZ7NUCBJOA"
+    example_to_address = "VGNJEZSWN66IXDE7FC3LFFCPGEP3DGHX5DHBUK662JDTS7OZ2SPF7CVKAI" # "P4IUIPHOHJTWFKMYYKZCBY3B6CVZ5RASWXHSFTJK2UYIGCVOLZ7NUCBJOA"
     example_amount = 2000000000
     example_node_address = "http://192.168.30.2:4100" # "http://192.168.30.5:4100"
     example_node_token = "97361fdc801fe9fd7f2ae87fa4ea5dc8b9b6ce7380c230eaf5494c4cb5d38d61"

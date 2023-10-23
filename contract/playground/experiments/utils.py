@@ -72,7 +72,7 @@ def get_testbed_algod_client():
     return algod_client
 
 def get_test_non_part_1():
-    algod_server = "http://192.168.30.4:4100"
+    algod_server = "http://192.168.30.5:4100"
     algod_token = ""
     algod_headers = {
         "Authorization": "Bearer 97361fdc801fe9fd7f2ae87fa4ea5dc8b9b6ce7380c230eaf5494c4cb5d38d61"
@@ -81,7 +81,7 @@ def get_test_non_part_1():
     return algod_client
 
 def get_test_non_part_2():
-    algod_server = "http://192.168.30.5:4100"
+    algod_server = "http://192.168.30.7:4100"
     algod_token = ""
     algod_headers = {
         "Authorization": "Bearer 97361fdc801fe9fd7f2ae87fa4ea5dc8b9b6ce7380c230eaf5494c4cb5d38d61"

@@ -1,6 +1,7 @@
 import algosdk
 import pyteal as pt
 import algokit_utils
+import base64
 
 # from beaker import Application, Authorize, GlobalStateValue, sandbox
 # from beaker.client import ApplicationClient
@@ -63,7 +64,7 @@ def demo() -> None:
     }
     address = "http://192.168.30.2:4100" #"https://testnet-algorand.api.purestake.io/ps2"
     # demonstration purposes only, never use mnemonics in code
-    mnemonic_1 = "rifle door book aim slogan joke load hair athlete shock castle lion speed rocket distance spawn add badge genius zero chef enforce suffer absent frost"
+    mnemonic_1 = "kitchen subway tomato hire inspire pepper camera frog about kangaroo bunker express length song act oven world quality around elegant lion chimney enough ability prepare"
     client = algod.AlgodClient(token, address, headers)
 
     # client = algokit_utils.get_algod_client(
@@ -81,8 +82,42 @@ def demo() -> None:
     # acct = accts.pop()
     private_key = mnemonic.to_private_key(mnemonic_1)
     print("Account address: ", account.address_from_private_key(private_key))
-    print("last_executed: ", last_executed)
-    # # Create an Application client containing both an algod client and my app
+    # print("last_executed: ", last_executed)
+    # # # Create an Application client containing both an algod client and my app
+    # local_schema = transaction.StateSchema(num_uints=1, num_byte_slices=1)
+    # global_schema = transaction.StateSchema(num_uints=1, num_byte_slices=1)
+
+    # with open("artifacts/approval.teal", "r") as f:
+    #     approval_program = f.read()
+
+    # with open("artifacts/clear.teal", "r") as f:
+    #     clear_program = f.read()
+
+    # print("approval prg: ", approval_program)
+    # approval_result = client.compile(approval_program)
+    # approval_binary = base64.b64decode(approval_result["result"])
+
+    # clear_result = client.compile(clear_program)
+    # clear_binary = base64.b64decode(clear_result["result"])
+
+    # example: APP_CREATE
+    # sp = client.suggested_params()
+    # # create the app create transaction, passing compiled programs and schema
+    # app_create_txn = transaction.ApplicationCreateTxn(
+    #     account.address_from_private_key(private_key),
+    #     sp,
+    #     transaction.OnComplete.NoOpOC,
+    #     approval_program=approval_binary,
+    #     clear_program=clear_binary,
+    #     global_schema=global_schema,
+    #     local_schema=local_schema,
+    # )
+    # # sign transaction
+    # signed_create_txn = app_create_txn.sign(private_key)
+    # txid = client.send_transaction(signed_create_txn)
+    # result = transaction.wait_for_confirmation(client, txid, 4)
+    # app_id = result["application-index"]
+    # print(f"Created app with id: {app_id}")
     try:
         # # Create an Application client containing both an algod client and my app
         app_client = ApplicationClient(
@@ -105,6 +140,7 @@ def demo() -> None:
         print("Encountered an AlgodHTTPError:", e)
     except Exception as e:
         print("Encountered a general exception:", e)
+
     # app_client = ApplicationClient(
     #     client=client,
     #     app=last_executed,
