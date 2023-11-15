@@ -4,8 +4,8 @@ import pyteal as pt
 import algokit_utils
 import json
 from algosdk import mnemonic, account, transaction, atomic_transaction_composer, abi
-from algosdk.atomic_transaction_composer import AccountTransactionSigner
 from algosdk.v2client import algod
+from algosdk.atomic_transaction_composer import AccountTransactionSigner
 import concurrent.futures
 
 from beaker.client import ApplicationClient
@@ -33,7 +33,7 @@ load_dotenv()  # take environment variables from .env.
 def generate_data():
     mnemonic_1 = "rifle door book aim slogan joke load hair athlete shock castle lion speed rocket distance spawn add badge genius zero chef enforce suffer absent frost"
     private_key = mnemonic.to_private_key(mnemonic_1)
-    app_id=34  # 238906986
+    app_id = 34  # 238906986
 
     # Initialize counters for increment and decrement functions
     increment_count = 0
@@ -172,6 +172,7 @@ def print_global_state(client, app_id):
 
 import time
 
+
 def wait_for_confirmation(algod_client, txid, timeout=2, retry_delay=3):
     """
     Wait for the transaction to be confirmed or rejected.
@@ -197,13 +198,20 @@ def wait_for_confirmation(algod_client, txid, timeout=2, retry_delay=3):
             # Check if the transaction is confirmed
             transaction_info = algod_client.pending_transaction_info(txid)
 
-            if "confirmed-round" in transaction_info and transaction_info["confirmed-round"] > 0:
+            if (
+                "confirmed-round" in transaction_info
+                and transaction_info["confirmed-round"] > 0
+            ):
                 return transaction_info
             elif "pool-error" in transaction_info and transaction_info["pool-error"]:
-                print(f"Transaction {txid} rejected with error: {transaction_info['pool-error']}")
+                print(
+                    f"Transaction {txid} rejected with error: {transaction_info['pool-error']}"
+                )
                 return None
         except Exception as e:
-            print(f"Error checking transaction {txid}: {e}. Retrying in {retry_delay} seconds...")
+            print(
+                f"Error checking transaction {txid}: {e}. Retrying in {retry_delay} seconds..."
+            )
             time.sleep(retry_delay)
 
         # Print status for debugging
@@ -214,10 +222,13 @@ def wait_for_confirmation(algod_client, txid, timeout=2, retry_delay=3):
             algod_client.status_after_block(current_round)
             current_round += 1
         except Exception as e:
-            print(f"Error waiting for block {current_round}: {e}. Retrying in {retry_delay} seconds...")
+            print(
+                f"Error waiting for block {current_round}: {e}. Retrying in {retry_delay} seconds..."
+            )
             time.sleep(retry_delay)
 
     raise Exception(f"Transaction {txid} not confirmed after {timeout} rounds")
+
 
 def print_address(mn):
     pk_account_a = mnemonic.to_private_key(mn)

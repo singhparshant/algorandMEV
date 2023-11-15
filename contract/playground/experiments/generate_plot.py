@@ -6,7 +6,7 @@ import matplotlib.patches as mpatches
 
 def generate_plot():
     # Read the data from the CSV file
-    data = pd.read_csv("experiment_data.csv")
+    data = pd.read_csv("experiment_data_1.csv")
 
     # Separate the data into x_values, y_values, colors and additional information
     x_values = data["Iteration"].tolist()
@@ -40,14 +40,14 @@ def generate_plot():
     )  # ensure the x-axis values are integers
 
     # Create custom legend
-    red_patch = mpatches.Patch(color="red", label="Decrement(Purestake Node)")
-    blue_patch = mpatches.Patch(color="blue", label="Increment(TUM Node)")
+    red_patch = mpatches.Patch(color="red", label="Decrement(B)")
+    blue_patch = mpatches.Patch(color="blue", label="Increment(A)")
     plt.legend(handles=[red_patch, blue_patch])
 
     # Print the results on the plot
     plt.subplots_adjust(top=0.85)
-    plt.figtext(0.3, 0.93, increment_info, fontsize=10, color="blue")
-    plt.figtext(0.3, 0.9, decrement_info, fontsize=10, color="red")
+    plt.text(0.9, 0.75, increment_info, fontsize=10, color="blue")
+    plt.text(0.9, 0.7, decrement_info, fontsize=10, color="red")
 
     plt.savefig("plot.svg", format="svg")
     plt.show()

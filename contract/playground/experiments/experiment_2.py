@@ -33,6 +33,7 @@ proposers_2 = []
 confirmed_rounds_1 = []
 confirmed_rounds_2 = []
 
+
 def generate_data():
     mnemonic_1 = "margin tackle shift airport stadium stool bounce step staff speak debate what resource era abuse evil draft answer tornado slide solid legend pond abstract crystal"
     private_key = mnemonic.to_private_key(mnemonic_1)
@@ -110,12 +111,10 @@ def generate_data():
         confirmed_rounds_1.append(confirmed_round_1)
         # confirmed_rounds_2.append(confirmed_round_2)
 
-
         # proposers_1.append(proposer_1)
         # proposers_2.append(proposer_2)
         # confirmed_rounds_1.append(confirmed_round_1)
         # confirmed_rounds_2.append(confirmed_round_2)
-
 
         updated_value = print_global_state(client1, app_id)
         print("After Value: ", updated_value, "\n")
@@ -138,7 +137,6 @@ def generate_data():
         print("before sleep")
         time.sleep(2)
         print("after sleep")
-
 
     # Calculate the total number of operations
     total_operations = increment_count + decrement_count
@@ -175,12 +173,13 @@ def generate_data():
                     percentage_increment,
                     decrement_count,
                     percentage_decrement,
-                    proposers_1[i],         # Use data from the list
+                    proposers_1[i],  # Use data from the list
                     confirmed_rounds_1[i],  # Use data from the list
                     # proposers_2[i],         # Use data from the list
                     # confirmed_rounds_2[i]   # Use data from the list
                 ]
             )
+
 
 def submit_and_wait_for_conf(client, atc):
     txids = submit_atc(atc, client)
@@ -188,11 +187,12 @@ def submit_and_wait_for_conf(client, atc):
     proposer = get_block_proposer(client, confirmed_round)
     return txids, transaction_info, confirmed_round, proposer
 
+
 def get_block_proposer(client, confirmed_round: int):
     try:
         response = client.block_info(confirmed_round, response_format="msgpack")
         decoded_response = msgpack.unpackb(response, raw=True, strict_map_key=False)
-        proposer = decoded_response[b'cert'][b'prop'][b'oprop']
+        proposer = decoded_response[b"cert"][b"prop"][b"oprop"]
         proposer = algod.encoding.encode_address(proposer)
         return proposer
     except Exception as e:

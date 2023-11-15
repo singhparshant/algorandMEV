@@ -17,7 +17,10 @@ from beaker import (
     unconditional_create_approval,
 )
 import os
-from playground.experiments.utils import get_testbed_algod_client, get_testnet_algod_client
+from playground.experiments.utils import (
+    get_testbed_algod_client,
+    get_testnet_algod_client,
+)
 from playground.experiments.utils import get_testnet_TUM_algod_client
 from dotenv import load_dotenv
 
@@ -62,10 +65,49 @@ def demo() -> None:
     headers = {
         "Authorization": "Bearer 97361fdc801fe9fd7f2ae87fa4ea5dc8b9b6ce7380c230eaf5494c4cb5d38d61"
     }
-    address = "http://192.168.30.2:4100" #"https://testnet-algorand.api.purestake.io/ps2"
+    address = (
+        "http://192.168.30.2:4100"  # "https://testnet-algorand.api.purestake.io/ps2"
+    )
     # demonstration purposes only, never use mnemonics in code
     mnemonic_1 = "kitchen subway tomato hire inspire pepper camera frog about kangaroo bunker express length song act oven world quality around elegant lion chimney enough ability prepare"
     client = algod.AlgodClient(token, address, headers)
+
+    private_key = mnemonic.to_private_key(mnemonic_1)
+    print("Account address: ", account.address_from_private_key(private_key))
+
+    local_schema = transaction.StateSchema(num_uints=1, num_byte_slices=1)
+    global_schema = transaction.StateSchema(num_uints=1, num_byte_slices=1)
+
+    with open("artifacts/approval.teal", "r") as f:
+        approval_program = f.read()
+
+    with open("artifacts/clear.teal", "r") as f:
+        clear_program = f.read()
+
+    approval_result = client.compile(approval_program)
+    approval_binary = base64.b64decode(approval_result["result"])
+
+    clear_result = client.compile(clear_program)
+    clear_binary = base64.b64decode(clear_result["result"])
+
+    # example: APP_CREATE
+    sp = client.suggested_params()
+    # create the app create transaction, passing compiled programs and schema
+    app_create_txn = transaction.ApplicationCreateTxn(
+        account.address_from_private_key(private_key),
+        sp,
+        transaction.OnComplete.NoOpOC,
+        approval_program=approval_binary,
+        clear_program=clear_binary,
+        global_schema=global_schema,
+        local_schema=local_schema,
+    )
+    # sign transaction
+    signed_create_txn = app_create_txn.sign(private_key)
+    txid = client.send_transaction(signed_create_txn)
+    result = transaction.wait_for_confirmation(client, txid, 4)
+    app_id = result["application-index"]
+    print(f"Created app with id: {app_id}")
 
     # client = algokit_utils.get_algod_client(
     #     algokit_utils.AlgoClientConfig(address, token)
@@ -130,7 +172,9 @@ def demo() -> None:
 
         # Create the applicatiion on chain, set the app id for the app client
         app_id, app_addr, txid = app_client.create()
-        print(f"Created App with id: {app_id} and address addr: {app_addr} in tx: {txid}")
+        print(
+            f"Created App with id: {app_id} and address addr: {app_addr} in tx: {txid}"
+        )
 
         app_client.call(increment)
         app_client.call(decrement)

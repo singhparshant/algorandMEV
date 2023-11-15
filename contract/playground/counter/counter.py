@@ -66,7 +66,6 @@ def demo() -> None:
     # demonstration purposes only, never use mnemonics in code
     mnemonic_1 = "rifle door book aim slogan joke load hair athlete shock castle lion speed rocket distance spawn add badge genius zero chef enforce suffer absent frost"
     client = algod.AlgodClient(token, address, headers)
-
     # client = algokit_utils.get_algod_client(
     #     algokit_utils.AlgoClientConfig(address, token)
     # )

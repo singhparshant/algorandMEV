@@ -4,12 +4,16 @@ from algosdk.v2client import indexer
 
 from dotenv import load_dotenv
 
-load_dotenv()  # take environment variables from .env.
+if load_dotenv(dotenv_path="../../../.env"):
+    print("Environment variables loaded.")
+else:
+    print("Couldn't load environment variables.")
 
 
 def get_testnet_algod_client():
     algod_token = ""
-    algod_headers = {"X-API-Key": os.getenv("TOKEN")}
+    algod_headers = {"X-API-Key": "jxSOmPn4DN3DpLNbylkiS2AMijXrb2Nl575cw3Fq"}
+    print(algod_headers)
     algod_server = "https://testnet-algorand.api.purestake.io/ps2"
 
     algod_client = algod.AlgodClient(algod_token, algod_server, algod_headers)
@@ -18,7 +22,7 @@ def get_testnet_algod_client():
 
 def get_mainnet_algod_client():
     algod_token = ""
-    algod_headers = {"X-API-Key": os.getenv("TOKEN")}
+    algod_headers = {"X-API-Key": "jxSOmPn4DN3DpLNbylkiS2AMijXrb2Nl575cw3Fq"}
     algod_server = "https://mainnet-algorand.api.purestake.io/ps2"
 
     algod_client = algod.AlgodClient(algod_token, algod_server, algod_headers)
@@ -36,9 +40,8 @@ def get_mainnet_indexer_client():
 
 def get_testnet_indexer_client():
     indexer_token = ""
-    indexer_headers = {"X-API-Key": os.getenv("PURESTAKE_TOKEN")}
+    indexer_headers = {"X-API-Key": "jxSOmPn4DN3DpLNbylkiS2AMijXrb2Nl575cw3Fq"}
     indexer_server = "https://testnet-algorand.api.purestake.io/idx2"
-
     myindexer = indexer.IndexerClient(indexer_token, indexer_server, indexer_headers)
     return myindexer
 
@@ -58,8 +61,15 @@ def get_mainnet_TUM_algod_client():
 
 
 def get_TUM_indexer_client():
-    indexer_server = "https://mainnet-algorand.api.purestake.io/idx2"
-    myindexer = indexer.IndexerClient(os.getenv("TOKEN_TUM_TESTNET"), indexer_server)
+    indexer_headers = {"X-API-Key": "ODBHPZFSZLRGDZMJDMLR8B24GUKLFXAY"}
+    indexer_server = (
+        "https://mainnet-idx.algonode.network"  # "http://131.159.14.109:8981"
+    )
+    myindexer = indexer.IndexerClient(
+        indexer_token="ODBHPZFSZLRGDZMJDMLR8B24GUKLFXAY",
+        indexer_address=indexer_server,
+        # indexer_headers=indexer_headers,
+    )
     return myindexer
 
 def get_testbed_algod_client():

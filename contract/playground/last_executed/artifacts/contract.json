@@ -1,0 +1,22 @@
+{
+    "name": "LastExecutedApp",
+    "methods": [
+        {
+            "name": "increment",
+            "args": [],
+            "returns": {
+                "type": "string"
+            },
+            "desc": "increment the counter"
+        },
+        {
+            "name": "decrement",
+            "args": [],
+            "returns": {
+                "type": "string"
+            },
+            "desc": "decrement the counter"
+        }
+    ],
+    "networks": {}
+}
